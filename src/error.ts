@@ -15,26 +15,45 @@ const codes = {
   GENERIC_ERROR: 500,
 }
 
-const getStatusCode = (code) => typeof code === 'number' ? code : codes[code] || codes.GENERIC_ERROR
-
-class ProtovisionError extends Error {
-  code: string | number
+class Interference extends Error {
+  type: string
   statusCode: number
   details: any
 
-  constructor(message: string, code: string | number = 'GENERIC_ERROR', details: any = {}) {
+  constructor(message: string, type: string = 'GENERIC_ERROR', details: any = {}, code: number = 500) {
     super(message)
 
-    this.name = this.constructor.name
-    Error.captureStackTrace(this, this.constructor)
-    const codeIsNumber = typeof code === 'number'
-    this.code = codes[code] ? code : codeIsNumber ? 'REMOTE_API_ERROR' : 'GENERIC_ERROR'
-    this.statusCode = codeIsNumber ? code : getStatusCode(code)
+    Object.defineProperty(this, 'message', {
+      configurable: true,
+      enumerable: false,
+      value: message,
+      writable: true,
+    })
+
+    Object.defineProperty(this, 'name', {
+      configurable: true,
+      enumerable: false,
+      value: this.constructor.name,
+      writable: true,
+    })
+
+    this.type = type
     this.details = details
+    this.statusCode = codes[code] || code
+
+    if (Error.hasOwnProperty('captureStackTrace')) {
+      Error.captureStackTrace(this, this.constructor)
+      return
+    }
+
+    Object.defineProperty(this, 'stack', {
+      configurable: true,
+      enumerable: false,
+      value: (new Error(message)).stack,
+      writable: true,
+    });
   }
 }
 
-export default (message: string, code?: string | number, details: any = {}): ProtovisionError | Error =>
-  Error.captureStackTrace ?
-  new ProtovisionError(message, code, details) :
-  new Error(message)
+export default (message: string, type?: string, details?: any, code?: number): Interference =>
+  new Interference(message, type, code, details)

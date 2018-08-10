@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios'
 import isUrl from 'is-url'
 import urlJoin from 'url-join'
 
-import ProtoVisionError from './error'
+import Interference from './error'
 
 export declare type ExovisionTransmit = (service: string, path: string, data?: any, options?: ITransmissionOptions) => Promise<any>
 export declare type ExovisionBoundTransmit = (path: string, data?: any, options?: ITransmissionOptions) => Promise<any>
@@ -51,7 +51,7 @@ const transmit = async (callOutpost: any, method: string, service: string, path:
     } = options
 
     if (transcodeResponse && typeof transcodeResponse !== 'function') {
-      throw ProtoVisionError('transcodeResponse must be a function')
+      throw Interference('transcodeResponse must be a function')
     }
 
     const baseConfig = buildConfig(`${urlJoin(service, path)}`, method, token, contentType, responseType)
@@ -76,20 +76,33 @@ const transmit = async (callOutpost: any, method: string, service: string, path:
       // console.log(error.response.data)
       // console.log(error.response.status)
       // console.log(error.response.headers)
-      throw ProtoVisionError(`Calling ${service} on ${path} url returns ${error.response.status} code.`, error.response.status, error.response.data)
+      throw Interference(
+        `Calling ${service} on ${path} url returns ${error.response.status} code.`,
+        'REMOTE_API_ERROR',
+        error.response.data,
+        error.response.status,
+      )
     } else if (error.request) {
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
       // http.ClientRequest in node.js
       // console.log(error.request)
-      throw ProtoVisionError(`There is no answer from ${service} at ${path} url: ${error.message}`, 'REMOTE_UNREACHABLE', error.config)
+      throw Interference(
+        `There is no answer from ${service} at ${path} url: ${error.message}`,
+        'REMOTE_UNREACHABLE',
+        error.config,
+      )
     } else {
       // Something happened in setting up the request that triggered an Error
       // console.log('Error', error.message)
       if (error.config) {
         console.log('Communicator config: ', error.config)
       }
-      throw ProtoVisionError(`Unhandled error calling ${service} at ${path} url: ${error.message}`, 'GENERIC_ERROR', error.config)
+      throw Interference(
+        `Unhandled error calling ${service} at ${path} url: ${error.message}`,
+        'GENERIC_ERROR',
+        error.config,
+      )
     }
   }
 }
@@ -105,7 +118,7 @@ export default (service: string): IExovision => {
     process.env[service] as string :
     service
   if (!isUrl(service)) {
-    throw ProtoVisionError(`Provide valid URL, either from ENV vars or by string: [protocol]://[domain]`)
+    throw Interference(`Provide valid URL, either from ENV vars or by string: [protocol]://[domain]`)
   }
 
   return {
