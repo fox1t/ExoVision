@@ -2,8 +2,8 @@
   "name": "exovision",
   "version": "0.2.0",
   "description": "Call remote HTTP services in an easy way, both in brwoser and node.js",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "prebuild": "run-s clean-build lint test",
     "build": "tsc -p ./tsconfig.json",
