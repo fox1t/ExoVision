@@ -5,9 +5,10 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "prebuild": "npm-run-all clean-build lint test",
+    "prebuild": "run-s clean-build test prettier lint",
     "build": "tsc -p ./tsconfig.json",
     "clean-build": "rimraf ./build && mkdir build",
+    "prettier": "prettier --loglevel warn --write \"src/**/*.{ts,tsx}\"",
     "lint": "tslint --fix -c tslint.json -t stylish -p ./tsconfig.json",
     "dev": "mocha -r ts-node/register -r dotenv/config src/test/**/*.ts --watch-extensions ts --watch",
     "test": "mocha -r ts-node/register -r dotenv/config src/test/**/*.ts"
@@ -40,6 +41,7 @@
     "mocha": "~5.2.0",
     "nock": "~9.4.3",
     "npm-run-all": "~4.1.3",
+    "prettier": "^1.14.3",
     "rimraf": "~2.6.2",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
@@ -47,6 +49,7 @@
   },
   "dependencies": {
     "axios": "~0.18.0",
+    "interference": "^0.4.6",
     "is-url": "~1.2.4",
     "url-join": "~4.0.0"
   },

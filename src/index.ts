@@ -2,16 +2,31 @@ import axios, { AxiosRequestConfig } from 'axios'
 import isUrl from 'is-url'
 import urlJoin from 'url-join'
 
-import Interference from './error'
+import Interference, { InjectCodes } from 'interference'
 
-export declare type ExovisionTransmit = (service: string, path: string, data?: any, options?: ITransmissionOptions) => Promise<any>
-export declare type ExovisionBoundTransmit = (path: string, data?: any, options?: ITransmissionOptions) => Promise<any>
+InjectCodes({
+  MISSING_MANDATORY_PRAMETER: 400,
+  REMOTE_UNREACHABLE: 503,
+  GENERIC_ERROR: 500,
+})
 
-export interface IExovision {
-  get: ExovisionBoundTransmit,
-  post: ExovisionBoundTransmit,
-  put: ExovisionBoundTransmit,
-  del: ExovisionBoundTransmit,
+export declare type ExovisionTransmit = (
+  service: string,
+  path: string,
+  data?: any,
+  options?: ITransmissionOptions,
+) => Promise<any>
+export declare type ExovisionBoundTransmit = (
+  path: string,
+  data?: any,
+  options?: ITransmissionOptions,
+) => Promise<any>
+
+export interface Exovision {
+  get: ExovisionBoundTransmit
+  post: ExovisionBoundTransmit
+  put: ExovisionBoundTransmit
+  del: ExovisionBoundTransmit
 }
 
 export interface ITransmissionOptions {
@@ -40,7 +55,14 @@ const buildConfig = (url, method, token, contentType, responseType): AxiosReques
   return config
 }
 
-const transmit = async (callOutpost: any, method: string, service: string, path: string, data: any = {}, options: ITransmissionOptions = {}) => {
+const transmit = async (
+  callOutpost: any,
+  method: string,
+  service: string,
+  path: string,
+  data: any = {},
+  options: ITransmissionOptions = {},
+) => {
   try {
     const {
       contentType = 'application/json',
@@ -51,14 +73,20 @@ const transmit = async (callOutpost: any, method: string, service: string, path:
     } = options
 
     if (transcodeResponse && typeof transcodeResponse !== 'function') {
-      throw Interference('transcodeResponse must be a function')
+      throw Interference('transcodeResponse must be a function', 'MISSING_MANDATORY_PRAMETER')
     }
 
-    const baseConfig = buildConfig(`${urlJoin(service, path)}`, method, token, contentType, responseType)
+    const baseConfig = buildConfig(
+      `${urlJoin(service, path)}`,
+      method,
+      token,
+      contentType,
+      responseType,
+    )
 
-    const config = ['POST', 'PUT', 'PATCH'].includes(method) ?
-      { ...baseConfig, data } :
-      { ...baseConfig, params: data }
+    const config = ['POST', 'PUT', 'PATCH'].includes(method)
+      ? { ...baseConfig, data }
+      : { ...baseConfig, params: data }
 
     if (echoCall) {
       return transcodeResponse ? transcodeResponse(config.data) : config.data
@@ -66,9 +94,7 @@ const transmit = async (callOutpost: any, method: string, service: string, path:
 
     const response = await callOutpost(config)
 
-    return transcodeResponse ?
-      transcodeResponse(response.data) :
-      response.data
+    return transcodeResponse ? transcodeResponse(response.data) : response.data
   } catch (error) {
     if (error.response) {
       // The request was made and the server responded with a status code
@@ -113,12 +139,13 @@ export const put: ExovisionTransmit = transmit.bind(null, axios, 'PUT')
 export const del: ExovisionTransmit = transmit.bind(null, axios, 'DELETE')
 
 // constructor function that returns Exovision with service bound
-export default (service: string): IExovision => {
-  service = isUrl(process.env[service]) ?
-    process.env[service] as string :
-    service
+export default (service: string): Exovision => {
+  service = isUrl(process.env[service]) ? (process.env[service] as string) : service
   if (!isUrl(service)) {
-    throw Interference(`Provide valid URL, either from ENV vars or by string: [protocol]://[domain]`)
+    throw Interference(
+      `Provide valid URL, either from ENV vars or by string: [protocol]://[domain]`,
+      'MISSING_MANDATORY_PRAMETER',
+    )
   }
 
   return {
