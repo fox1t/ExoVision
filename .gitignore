@@ -30,7 +30,7 @@ bower_components
 .lock-wscript
 
 # Compiled JavaScript dir
-build
+lib
 
 # Dependency directories
 node_modules/
