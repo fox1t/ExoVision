@@ -1,6 +1,6 @@
 {
   "name": "exovision",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Call remote HTTP services in an easy way, both in brwoser and node.js",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
