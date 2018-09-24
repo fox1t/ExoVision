@@ -34,7 +34,6 @@ export interface ITransmissionOptions {
   responseType?: string
   transcodeResponse?<O, T>(data: O): T | Promise<T>
   echoCall?: boolean
-  rootXml?: string
   token?: string
 }
 
