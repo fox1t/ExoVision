@@ -142,7 +142,6 @@ export const del: ExovisionTransmit = transmit.bind(null, axios, 'DELETE')
 export default (service: string): Exovision => {
   service =
     process.env[service] && isUrl(process.env[service]) ? (process.env[service] as string) : service
-  console.log(`${service} ${isUrl(service)}`)
   if (!isUrl(service)) {
     throw Interference(
       `Provide valid URL for ${service}, either from ENV vars or by string: [protocol]://[domain]`,
