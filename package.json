@@ -53,7 +53,7 @@
   "dependencies": {
     "axios": "0.18.0",
     "interference": "~0.5.2",
-    "is-url": "1.2.4",
+    "ip-regex": "3.0.0",
     "url-join": "4.0.0"
   },
   "files": [

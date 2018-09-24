@@ -11,6 +11,16 @@ describe(`Exovision Instantiation`, () => {
     expect(typeof exampleOutpost).to.equal('object')
   })
 
+  it(`Instantiate Exovision on 'http://domain'`, () => {
+    const exampleOutpost = ExovisionFactory('http://domain')
+    expect(typeof exampleOutpost).to.equal('object')
+  })
+
+  it(`Instantiate Exovision on 'http://212.168.1.20'`, () => {
+    const exampleOutpost = ExovisionFactory('http://212.168.1.20')
+    expect(typeof exampleOutpost).to.equal('object')
+  })
+
   it(`Instantiate Exovision on 'OUTPOSTS_API' env var.`, () => {
     const exampleOutpost = ExovisionFactory('OUTPOSTS_API')
     expect(typeof exampleOutpost).to.equal('object')

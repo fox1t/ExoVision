@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import isUrl from 'is-url'
+import isUrl from './is-url'
 import urlJoin from 'url-join'
 
 import Interference, { InjectCodes } from 'interference'
@@ -140,7 +140,9 @@ export const del: ExovisionTransmit = transmit.bind(null, axios, 'DELETE')
 
 // constructor function that returns Exovision with service bound
 export default (service: string): Exovision => {
-  service = isUrl(process.env[service]) ? (process.env[service] as string) : service
+  service =
+    process.env[service] && isUrl(process.env[service]) ? (process.env[service] as string) : service
+  console.log(`${service} ${isUrl(service)}`)
   if (!isUrl(service)) {
     throw Interference(
       `Provide valid URL for ${service}, either from ENV vars or by string: [protocol]://[domain]`,
