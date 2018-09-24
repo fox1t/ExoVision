@@ -143,7 +143,7 @@ export default (service: string): Exovision => {
   service = isUrl(process.env[service]) ? (process.env[service] as string) : service
   if (!isUrl(service)) {
     throw Interference(
-      `Provide valid URL, either from ENV vars or by string: [protocol]://[domain]`,
+      `Provide valid URL for ${service}, either from ENV vars or by string: [protocol]://[domain]`,
       'MISSING_MANDATORY_PRAMETER',
     )
   }
