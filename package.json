@@ -51,10 +51,10 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    "axios": "~0.18.0",
-    "interference": "^0.5.0",
-    "is-url": "~1.2.4",
-    "url-join": "~4.0.0"
+    "axios": "0.18.0",
+    "interference": "~0.5.1",
+    "is-url": "1.2.4",
+    "url-join": "4.0.0"
   },
   "files": [
     "/lib"
