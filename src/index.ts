@@ -35,13 +35,22 @@ export interface ITransmissionOptions {
   transcodeResponse?<O, T>(data: O): T | Promise<T>
   echoCall?: boolean
   token?: string
+  headers?: any
 }
 
-const buildConfig = (url, method, token, contentType, responseType): AxiosRequestConfig => {
+const buildConfig = (
+  url,
+  method,
+  token,
+  contentType,
+  responseType,
+  headers: any = {},
+): AxiosRequestConfig => {
   const config = {
     method,
     url,
     headers: {
+      ...headers,
       'Content-Type': contentType,
     },
     responseType,
@@ -69,6 +78,7 @@ const transmit = async (
       echoCall = false,
       transcodeResponse,
       token,
+      headers,
     } = options
 
     if (transcodeResponse && typeof transcodeResponse !== 'function') {
@@ -81,6 +91,7 @@ const transmit = async (
       token,
       contentType,
       responseType,
+      headers,
     )
 
     const config = ['POST', 'PUT', 'PATCH'].includes(method)
