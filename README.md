@@ -1,6 +1,6 @@
 # ExoVision
 
-Call remote HTTP RESTful services in easy way, both in brwoser and Node.js.
+Call remote HTTP RESTful services in easy way, both in browser and Node.js.
 
 ```typescript
 import exovision from 'exovision' // const exovision = require('exovision').default
