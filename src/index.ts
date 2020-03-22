@@ -31,7 +31,7 @@ export interface Exovision {
 
 export interface ITransmissionOptions {
   contentType?: string
-  responseType?: string
+  responseType?: AxiosRequestConfig['responseType']
   transcodeResponse?<O, T>(data: O): T | Promise<T>
   echoCall?: boolean
   token?: string
@@ -39,11 +39,11 @@ export interface ITransmissionOptions {
 }
 
 const buildConfig = (
-  url,
-  method,
-  token,
-  contentType,
-  responseType,
+  url: string,
+  method: AxiosRequestConfig['method'],
+  token: string | undefined,
+  contentType: string,
+  responseType: AxiosRequestConfig['responseType'],
   headers: any = {},
 ): AxiosRequestConfig => {
   const config = {
@@ -63,9 +63,11 @@ const buildConfig = (
   return config
 }
 
+const bodyMethods: AxiosRequestConfig['method'][] = ['POST', 'PUT', 'PATCH', 'DELETE']
+
 const transmit = async (
   callOutpost: any,
-  method: string,
+  method: AxiosRequestConfig['method'],
   service: string,
   path: string,
   data: any = {},
@@ -94,7 +96,7 @@ const transmit = async (
       headers,
     )
 
-    const config = ['POST', 'PUT', 'PATCH'].includes(method)
+    const config = bodyMethods.includes(method)
       ? { ...baseConfig, data }
       : { ...baseConfig, params: data }
 

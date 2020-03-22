@@ -75,6 +75,14 @@ describe(`Test 'OUTPOSTS_API' service.`, () => {
     expect(outpost).to.deep.equal({})
   })
 
+  it(`DELETE single outpost with body`, async () => {
+    const outpost = await outpostsVision.del('/api/v1/outposts/5b22ef3881af6d53c4adce10', {
+      foo: 'bar',
+    })
+
+    expect(outpost).to.deep.equal({ body: 'ok' })
+  })
+
   it(`GET no answer on /outposts`, async () => {
     try {
       await outpostsVision.get('/api/v1/outposts/noanswer')
