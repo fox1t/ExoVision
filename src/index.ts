@@ -2,13 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios'
 import isUrl from './is-url'
 import urlJoin from 'url-join'
 
-import Interference, { InjectCodes } from 'interference'
-
-InjectCodes({
-  MISSING_MANDATORY_PRAMETER: 400,
-  REMOTE_UNREACHABLE: 503,
-  GENERIC_ERROR: 500,
-})
+import Interference from 'interference'
 
 export declare type ExovisionTransmit = (
   service: string,
@@ -84,7 +78,11 @@ const transmit = async (
     } = options
 
     if (transcodeResponse && typeof transcodeResponse !== 'function') {
-      throw Interference('transcodeResponse must be a function', 'MISSING_MANDATORY_PRAMETER')
+      throw Interference({
+        message: 'transcodeResponse must be a function',
+        type: 'MISSING_MANDATORY_PRAMETER',
+        statusCode: 400,
+      })
     }
 
     const baseConfig = buildConfig(
@@ -114,33 +112,34 @@ const transmit = async (
       // console.log(error.response.data)
       // console.log(error.response.status)
       // console.log(error.response.headers)
-      throw Interference(
-        `Calling ${service} on ${path} url returns ${error.response.status} code.`,
-        'REMOTE_API_ERROR',
-        error.response.data,
-        error.response.status,
-      )
+      throw Interference({
+        message: `Calling ${service} on ${path} url returns ${error.response.status} code.`,
+        type: 'REMOTE_API_ERROR',
+        details: error.response.data,
+        statusCode: error.response.status,
+      })
     } else if (error.request) {
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
       // http.ClientRequest in node.js
       // console.log(error.request)
-      throw Interference(
-        `There is no answer from ${service} at ${path} url: ${error.message}`,
-        'REMOTE_UNREACHABLE',
-        error.config,
-      )
+      throw Interference({
+        message: `There is no answer from ${service} at ${path} url: ${error.message}`,
+        type: 'REMOTE_UNREACHABLE',
+        details: error.config,
+        statusCode: 503,
+      })
     } else {
       // Something happened in setting up the request that triggered an Error
       // console.log('Error', error.message)
       if (error.config) {
         console.log('Communicator config: ', error.config)
       }
-      throw Interference(
-        `Unhandled error calling ${service} at ${path} url: ${error.message}`,
-        'GENERIC_ERROR',
-        error.config,
-      )
+      throw Interference({
+        message: `Unhandled error calling ${service} at ${path} url: ${error.message}`,
+        type: 'GENERIC_ERROR',
+        details: error.config,
+      })
     }
   }
 }
@@ -155,10 +154,11 @@ export default (service: string): Exovision => {
   service =
     process.env[service] && isUrl(process.env[service]) ? (process.env[service] as string) : service
   if (!isUrl(service)) {
-    throw Interference(
-      `Provide valid URL for ${service}, either from ENV vars or by string: [protocol]://[domain]`,
-      'MISSING_MANDATORY_PRAMETER',
-    )
+    throw Interference({
+      message: `Provide valid URL for ${service}, either from ENV vars or by string: [protocol]://[domain]`,
+      type: 'MISSING_MANDATORY_PRAMETER',
+      statusCode: 400,
+    })
   }
 
   return {
